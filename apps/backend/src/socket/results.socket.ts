@@ -1,0 +1,3 @@
+export {
+    emitResultsUpdated
+} from "./index";

@@ -1,0 +1,260 @@
+enum ScopeLevel {
+  COUNTY
+  CONSTITUENCY
+  WARD
+  POLLING_STATION
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  module    String
+  recordId  String?
+  oldData   Json?
+  newData   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([module])
+  @@index([action])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  permissions RolePermission[]
+  users       User[]
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  roles RolePermission[]
+}
+
+model RolePermission {
+  id           String   @id @default(cuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model User {
+  id        String  @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String  @unique
+  password  String
+  active    Boolean @default(true)
+
+  roleId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role      Role        @relation(fields: [roleId], references: [id])
+  auditLogs AuditLog[]
+  scopes    UserScope[]
+
+  @@index([roleId])
+}
+
+model UserScope {
+  id String @id @default(cuid())
+
+  userId String
+  level  ScopeLevel
+
+  countyId         String?
+  constituencyId   String?
+  wardId           String?
+  pollingStationId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  county         County?         @relation(fields: [countyId], references: [id], onDelete: Cascade)
+  constituency   Constituency?   @relation(fields: [constituencyId], references: [id], onDelete: Cascade)
+  ward           Ward?           @relation(fields: [wardId], references: [id], onDelete: Cascade)
+  pollingStation PollingStation? @relation(fields: [pollingStationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, level, countyId, constituencyId, wardId, pollingStationId])
+  @@index([userId])
+  @@index([level])
+  @@index([countyId])
+  @@index([constituencyId])
+  @@index([wardId])
+  @@index([pollingStationId])
+}
+
+model County {
+  id   String @id @default(cuid())
+  name String @unique
+  code String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  constituencies Constituency[]
+  userScopes     UserScope[]
+}
+
+model Constituency {
+  id       String @id @default(cuid())
+  name     String
+  code     String @unique
+  countyId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  county     County      @relation(fields: [countyId], references: [id], onDelete: Cascade)
+  wards      Ward[]
+  userScopes UserScope[]
+
+  @@index([countyId])
+}
+
+model Ward {
+  id             String @id @default(cuid())
+  name           String
+  code           String @unique
+  constituencyId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  constituency    Constituency     @relation(fields: [constituencyId], references: [id], onDelete: Cascade)
+  pollingStations PollingStation[]
+  userScopes      UserScope[]
+
+  @@index([constituencyId])
+}
+
+model PollingStation {
+  id               String @id @default(cuid())
+  name             String
+  code             String @unique
+  registeredVoters Int
+  wardId           String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ward       Ward        @relation(fields: [wardId], references: [id], onDelete: Cascade)
+  results    Result[]
+  userScopes UserScope[]
+
+  @@index([wardId])
+}
+
+model Election {
+  id          String  @id @default(cuid())
+  name        String
+  year        Int
+  description String?
+  status      String  @default("draft")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  positions  ElectionPosition[]
+  candidates Candidate[]
+  results    Result[]
+
+  @@unique([name, year])
+}
+
+model ElectionPosition {
+  id         String @id @default(cuid())
+  name       String
+  electionId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  election   Election    @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  candidates Candidate[]
+
+  @@unique([electionId, name])
+  @@index([electionId])
+}
+
+model Candidate {
+  id         String @id @default(cuid())
+  name       String
+  electionId String
+  positionId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  election Election         @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  position ElectionPosition @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  results Result[]
+
+  @@index([electionId])
+  @@index([positionId])
+}
+
+model Result {
+  id String @id @default(cuid())
+
+  electionId       String
+  candidateId      String
+  pollingStationId String
+
+  votes Int @default(0)
+
+  status String @default("pending")
+
+  verifiedAt DateTime?
+  verifiedBy String?
+
+  approvedAt DateTime?
+  approvedBy String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  election       Election       @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  candidate      Candidate      @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  pollingStation PollingStation @relation(fields: [pollingStationId], references: [id], onDelete: Cascade)
+
+  @@unique([electionId, candidateId, pollingStationId])
+  @@index([electionId])
+  @@index([candidateId])
+  @@index([pollingStationId])
+  @@index([status])
+}
