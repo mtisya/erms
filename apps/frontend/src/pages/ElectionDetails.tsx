@@ -86,10 +86,7 @@ export default function ElectionDetails() {
     ] = useState<Election | null>(null);
 
 
-    const [
-        loading,
-        setLoading
-    ] = useState(true);
+    const [loading, setLoading] = useState(Boolean(id));
 
 
     const [
@@ -104,19 +101,10 @@ export default function ElectionDetails() {
     |--------------------------------------------------------------------------
     */
 
-    useEffect(() => {
-
-        if (!id) {
-
-            setError(
-                "Election ID was not provided."
-            );
-
-            setLoading(false);
-
-            return;
-
-        }
+  useEffect(() => {
+    if (!id) {
+        return;
+    }
 
 
         const loadElection =
@@ -169,7 +157,7 @@ export default function ElectionDetails() {
                         electionData
                     );
 
-                } catch (error: any) {
+                    } catch (error: unknown) {
 
                     console.error(
                         "Failed to load election:",
@@ -178,8 +166,9 @@ export default function ElectionDetails() {
 
 
                     setError(
-                        error.message ||
-                        "Failed to load election"
+                        error instanceof Error
+                            ? error.message
+                            : "Failed to load election"
                     );
 
                 } finally {

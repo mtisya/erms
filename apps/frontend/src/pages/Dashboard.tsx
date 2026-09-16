@@ -15,9 +15,7 @@ import type {
     DashboardSummary
 } from "../services/dashboardService";
 
-import {
-    useAuth
-} from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 
 export default function Dashboard() {
@@ -59,7 +57,7 @@ export default function Dashboard() {
 
                 setSummary(data);
 
-            } catch (error: any) {
+            } catch (error: unknown) {
 
                 console.error(
                     "Failed to load dashboard:",
@@ -67,8 +65,9 @@ export default function Dashboard() {
                 );
 
                 setError(
-                    error.message ||
-                    "Unable to load dashboard"
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to load dashboard"
                 );
 
             } finally {

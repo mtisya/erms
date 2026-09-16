@@ -80,148 +80,136 @@ export default function Home() {
         );
 
 
-    useEffect(() => {
+useEffect(() => {
+    /*
+    |--------------------------------------------------------------------------
+    | Initial API Load
+    |--------------------------------------------------------------------------
+    */
 
-        /*
-        |--------------------------------------------------------------------------
-        | Initial API Load
-        |--------------------------------------------------------------------------
-        */
+    const loadTimer = window.setTimeout(() => {
+        void loadResults();
+    }, 0);
 
-        loadResults();
+    /*
+    |--------------------------------------------------------------------------
+    | Socket.IO
+    |--------------------------------------------------------------------------
+    */
 
+    const socket =
+        connectResultsSocket();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Socket.IO
-        |--------------------------------------------------------------------------
-        */
+    const handleConnect = () => {
+        console.log(
+            "Home Socket connected:",
+            socket.id
+        );
 
-        const socket =
-            connectResultsSocket();
+        setSocketConnected(true);
+    };
 
+    const handleDisconnect = () => {
+        console.log(
+            "Home Socket disconnected"
+        );
 
-        const handleConnect =
-            () => {
+        setSocketConnected(false);
+    };
 
-                console.log(
-                    "Home Socket connected:",
-                    socket.id
-                );
+    socket.on(
+        "connect",
+        handleConnect
+    );
 
-                setSocketConnected(true);
+    socket.on(
+        "disconnect",
+        handleDisconnect
+    );
 
-            };
+    /*
+    |--------------------------------------------------------------------------
+    | Join Election
+    |--------------------------------------------------------------------------
+    */
 
+    joinElection(
+        ELECTION_ID
+    );
 
-        const handleDisconnect =
-            () => {
+    /*
+    |--------------------------------------------------------------------------
+    | Results Updated
+    |--------------------------------------------------------------------------
+    */
 
-                console.log(
-                    "Home Socket disconnected"
-                );
+    const handleResultsUpdated = (
+        data: {
+            electionId: string;
+            updatedAt: string;
+        }
+    ) => {
+        console.log(
+            "HOME RESULTS UPDATED:",
+            data
+        );
 
-                setSocketConnected(false);
+        if (
+            data.electionId !==
+            ELECTION_ID
+        ) {
+            return;
+        }
 
-            };
+        void loadResults();
+    };
 
+    onResultsUpdated(
+        handleResultsUpdated
+    );
 
-        socket.on(
+    /*
+    |--------------------------------------------------------------------------
+    | Already Connected
+    |--------------------------------------------------------------------------
+    */
+
+    if (socket.connected) {
+        window.setTimeout(() => {
+            setSocketConnected(true);
+        }, 0);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cleanup
+    |--------------------------------------------------------------------------
+    */
+
+    return () => {
+        window.clearTimeout(
+            loadTimer
+        );
+
+        removeResultsUpdatedListener(
+            handleResultsUpdated
+        );
+
+        socket.off(
             "connect",
             handleConnect
         );
 
-
-        socket.on(
+        socket.off(
             "disconnect",
             handleDisconnect
         );
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Join Election
-        |--------------------------------------------------------------------------
-        */
-
-        joinElection(
+        leaveElection(
             ELECTION_ID
         );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Results Updated
-        |--------------------------------------------------------------------------
-        */
-
-        const handleResultsUpdated =
-            (
-                data: {
-                    electionId: string;
-                    updatedAt: string;
-                }
-            ) => {
-
-                console.log(
-                    "HOME RESULTS UPDATED:",
-                    data
-                );
-
-
-                if (
-                    data.electionId !==
-                    ELECTION_ID
-                ) {
-
-                    return;
-
-                }
-
-
-                loadResults();
-
-            };
-
-
-        onResultsUpdated(
-            handleResultsUpdated
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Cleanup
-        |--------------------------------------------------------------------------
-        */
-
-        return () => {
-
-            removeResultsUpdatedListener(
-                handleResultsUpdated
-            );
-
-
-            socket.off(
-                "connect",
-                handleConnect
-            );
-
-
-            socket.off(
-                "disconnect",
-                handleDisconnect
-            );
-
-
-            leaveElection(
-                ELECTION_ID
-            );
-
-        };
-
-    }, [loadResults]);
-
+    };
+}, [loadResults]);
 
     /*
     |--------------------------------------------------------------------------

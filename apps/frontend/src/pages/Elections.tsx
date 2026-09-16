@@ -141,7 +141,7 @@ export default function Elections() {
                         electionData
                     );
 
-                } catch (error: any) {
+                } catch (error: unknown) {
 
                     console.error(
                         "Failed to load elections:",
@@ -150,9 +150,10 @@ export default function Elections() {
 
 
                     setError(
-                        error.message ||
-                        "Failed to load elections"
-                    );
+    error instanceof Error
+        ? error.message
+        : "Failed to load elections"
+);
 
                 } finally {
 

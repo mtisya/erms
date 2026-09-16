@@ -118,6 +118,15 @@ const API_URL =
     "http://localhost:5000/api";
 
 
+function getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+        return error.message;
+    }
+
+    return "An unexpected error occurred";
+}
+
+
 /*
 |--------------------------------------------------------------------------
 | Admin Result Entry
@@ -132,7 +141,7 @@ export default function AdminResultEntry() {
     ] = useSearchParams();
 
 
-    const electionId =
+    const queryElectionId =
         searchParams.get("election");
 
 
@@ -178,10 +187,8 @@ export default function AdminResultEntry() {
     ] = useState<ExistingResult[]>([]);
 
 
-    const [
-        loading,
-        setLoading
-    ] = useState(true);
+   const [loading, setLoading] =
+    useState(Boolean(queryElectionId));
 
 
     const [
@@ -214,29 +221,15 @@ export default function AdminResultEntry() {
     |--------------------------------------------------------------------------
     */
 
-    useEffect(() => {
+useEffect(() => {
+    if (!queryElectionId) {
+        return;
+    }
 
-        if (!electionId) {
-
-            setError(
-                "No election was selected."
-            );
-
-            setLoading(false);
-
-            return;
-
-        }
-
-
-        const loadData =
-            async () => {
-
-                try {
-
-                    setLoading(true);
-
-                    setError(null);
+    const loadData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
 
 
                     const [
@@ -246,11 +239,11 @@ export default function AdminResultEntry() {
                     ] = await Promise.all([
 
                         fetch(
-                            `${API_URL}/elections/${electionId}`
+                            `${API_URL}/elections/${queryElectionId}`
                         ),
 
                         fetch(
-                            `${API_URL}/candidates?electionId=${electionId}`
+                            `${API_URL}/candidates?electionId=${queryElectionId}`
                         ),
 
                         fetch(
@@ -338,31 +331,25 @@ export default function AdminResultEntry() {
                         stationsJson.data ?? []
                     );
 
-                } catch (error: any) {
+               } catch (error: unknown) {
+    console.error(
+        "Failed to load result management:",
+        error
+    );
 
-                    console.error(
-                        "Failed to load result management:",
-                        error
-                    );
-
-
-                    setError(
-                        error.message ||
-                        "Failed to load result management"
-                    );
-
-                } finally {
-
-                    setLoading(false);
-
-                }
+    setError(
+        getErrorMessage(error)
+    );
+} finally {
+    setLoading(false);
+}
 
             };
 
 
         loadData();
 
-    }, [electionId]);
+    }, [queryElectionId]);
 
 
     /*
@@ -371,18 +358,13 @@ export default function AdminResultEntry() {
     |--------------------------------------------------------------------------
     */
 
-    useEffect(() => {
-
-        if (
-            !electionId ||
-            !selectedStation
-        ) {
-
-            setExistingResults([]);
-
-            return;
-
-        }
+ useEffect(() => {
+    if (
+        !queryElectionId ||
+        !selectedStation
+    ) {
+        return;
+    }
 
 
         const loadExistingResults =
@@ -437,7 +419,7 @@ export default function AdminResultEntry() {
                         allResults.filter(
                             result =>
                                 result.electionId ===
-                                electionId &&
+                                queryElectionId &&
                                 result.pollingStationId ===
                                 selectedStation
                         );
@@ -496,24 +478,18 @@ export default function AdminResultEntry() {
 
                     }
 
-                } catch (error: any) {
+                }  catch (error: unknown) {
+    console.error(
+        "Failed to load existing results:",
+        error
+    );
 
-                    console.error(
-                        "Failed to load existing results:",
-                        error
-                    );
-
-
-                    setError(
-                        error.message ||
-                        "Failed to check existing results"
-                    );
-
-                } finally {
-
-                    setLoadingResults(false);
-
-                }
+    setError(
+        getErrorMessage(error)
+    );
+} finally {
+    setLoadingResults(false);
+}
 
             };
 
@@ -521,7 +497,7 @@ export default function AdminResultEntry() {
         loadExistingResults();
 
     }, [
-        electionId,
+        queryElectionId,
         selectedStation,
         candidates
     ]);
@@ -728,7 +704,7 @@ export default function AdminResultEntry() {
             setSuccess(null);
 
 
-            if (!electionId) {
+            if (!queryElectionId) {
 
                 setError(
                     "No election was selected."
@@ -802,7 +778,7 @@ export default function AdminResultEntry() {
 
                     const payload = {
 
-                        electionId,
+                        electionId: queryElectionId,
 
                         candidateId:
                             item.candidateId,
@@ -953,7 +929,7 @@ export default function AdminResultEntry() {
                                     ExistingResult
                             ) =>
                                 result.electionId ===
-                                electionId &&
+                                queryElectionId &&
                                 result.pollingStationId ===
                                 selectedStation
                         );
@@ -1010,24 +986,18 @@ export default function AdminResultEntry() {
 
                 );
 
-            } catch (error: any) {
+            } catch (error: unknown) {
+    console.error(
+        "Failed to submit results:",
+        error
+    );
 
-                console.error(
-                    "Failed to submit results:",
-                    error
-                );
-
-
-                setError(
-                    error.message ||
-                    "Failed to submit results"
-                );
-
-            } finally {
-
-                setSubmitting(false);
-
-            }
+    setError(
+        getErrorMessage(error)
+    );
+} finally {
+    setSubmitting(false);
+}
 
         };
 

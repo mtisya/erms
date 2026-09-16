@@ -47,7 +47,6 @@ export default function LiveResultsPage() {
     const electionId =
         searchParams.get("election")?.trim() || null;
 
-
     /*
     |--------------------------------------------------------------------------
     | State
@@ -60,10 +59,7 @@ export default function LiveResultsPage() {
     ] = useState<LiveResults | null>(null);
 
 
-    const [
-        loading,
-        setLoading
-    ] = useState(true);
+    const [loading, setLoading] = useState(Boolean(electionId));
 
 
     const [
@@ -116,17 +112,9 @@ export default function LiveResultsPage() {
                 */
 
                 if (!electionId) {
-
                     setResults(null);
-
-                    setError(
-                        "No election was selected. Please select an election first."
-                    );
-
                     setLoading(false);
-
                     return;
-
                 }
 
 
@@ -193,9 +181,13 @@ export default function LiveResultsPage() {
     */
 
     useEffect(() => {
+        const timer = window.setTimeout(() => {
+            void loadResults();
+        }, 0);
 
-        loadResults();
-
+        return () => {
+            window.clearTimeout(timer);
+        };
     }, [loadResults]);
 
 
@@ -206,222 +198,101 @@ export default function LiveResultsPage() {
     */
 
     useEffect(() => {
-
-        /*
-        |--------------------------------------------------------------------------
-        | No election selected
-        |--------------------------------------------------------------------------
-        |
-        | Do not connect/join an election room when there is no election ID.
-        |
-        */
-
         if (!electionId) {
-
-            setSocketConnected(false);
-
             return;
-
         }
-
 
         console.log(
             "Connecting to results socket for election:",
             electionId
         );
 
+        const socket = connectResultsSocket();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Connect
-        |--------------------------------------------------------------------------
-        */
+        const handleConnect = () => {
+            console.log(
+                "Live Results Socket connected:",
+                socket.id
+            );
 
-        const socket =
-            connectResultsSocket();
+            setSocketConnected(true);
 
+            joinElection(electionId);
+        };
 
-        /*
-        |--------------------------------------------------------------------------
-        | Socket Connected
-        |--------------------------------------------------------------------------
-        */
+        const handleDisconnect = () => {
+            console.log(
+                "Live Results Socket disconnected"
+            );
 
-        const handleConnect =
-            () => {
+            setSocketConnected(false);
+        };
 
-                console.log(
-                    "Live Results Socket connected:",
-                    socket.id
-                );
+        const handleResultsUpdated = (
+            data: {
+                electionId: string;
+                updatedAt: string;
+            }
+        ) => {
+            console.log(
+                "LIVE RESULTS UPDATED:",
+                data
+            );
 
+            if (
+                data.electionId !==
+                electionId
+            ) {
+                return;
+            }
 
-                setSocketConnected(true);
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Join election room after connection
-                |--------------------------------------------------------------------------
-                */
-
-                joinElection(
-                    electionId
-                );
-
-            };
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Socket Disconnected
-        |--------------------------------------------------------------------------
-        */
-
-        const handleDisconnect =
-            () => {
-
-                console.log(
-                    "Live Results Socket disconnected"
-                );
-
-
-                setSocketConnected(false);
-
-            };
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Results Updated
-        |--------------------------------------------------------------------------
-        */
-
-        const handleResultsUpdated =
-            (
-                data: {
-                    electionId: string;
-                    updatedAt: string;
-                }
-            ) => {
-
-                console.log(
-                    "LIVE RESULTS UPDATED:",
-                    data
-                );
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Ignore updates belonging to another election
-                |--------------------------------------------------------------------------
-                */
-
-                if (
-                    data.electionId !==
-                    electionId
-                ) {
-
-                    return;
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Reload latest results
-                |--------------------------------------------------------------------------
-                */
-
-                loadResults();
-
-            };
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Register Listeners
-        |--------------------------------------------------------------------------
-        */
+            void loadResults();
+        };
 
         socket.on(
             "connect",
             handleConnect
         );
 
-
         socket.on(
             "disconnect",
             handleDisconnect
         );
 
-
         onResultsUpdated(
             handleResultsUpdated
         );
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Already Connected
-        |--------------------------------------------------------------------------
-        |
-        | If connectResultsSocket() returns an already-connected socket,
-        | the "connect" event will not fire again.
-        |
-        */
-
         if (socket.connected) {
+            joinElection(electionId);
 
-            setSocketConnected(true);
-
-            joinElection(
-                electionId
-            );
-
+            window.setTimeout(() => {
+                setSocketConnected(true);
+            }, 0);
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Cleanup
-        |--------------------------------------------------------------------------
-        */
-
         return () => {
-
             console.log(
                 "Cleaning up results socket for election:",
                 electionId
             );
 
-
             removeResultsUpdatedListener(
                 handleResultsUpdated
             );
-
 
             socket.off(
                 "connect",
                 handleConnect
             );
 
-
             socket.off(
                 "disconnect",
                 handleDisconnect
             );
 
-
-            leaveElection(
-                electionId
-            );
-
-
-            setSocketConnected(false);
-
+            leaveElection(electionId);
         };
-
     }, [
         electionId,
         loadResults
@@ -515,96 +386,96 @@ export default function LiveResultsPage() {
     |--------------------------------------------------------------------------
     */
 
-if (error) {
+    if (error) {
 
-    return (
+        return (
 
-        <div className="results-page">
+            <div className="results-page">
 
-            <header className="results-navbar">
+                <header className="results-navbar">
 
-                <div className="results-container">
-
-                    <Link
-                        to="/"
-                        className="results-logo"
-                    >
-                        ERMS
-                    </Link>
-
-
-                    <nav className="results-nav">
-
-                        <Link to="/">
-                            Home
-                        </Link>
-
-                        <Link to="/elections">
-                            Elections
-                        </Link>
+                    <div className="results-container">
 
                         <Link
-                            to="/results"
-                            className="active"
+                            to="/"
+                            className="results-logo"
                         >
-                            Live Results
+                            ERMS
                         </Link>
 
-                        <Link
-                            to="/login"
-                            className="results-login"
-                        >
-                            Login
-                        </Link>
 
-                    </nav>
+                        <nav className="results-nav">
 
-                </div>
+                            <Link to="/">
+                                Home
+                            </Link>
 
-            </header>
+                            <Link to="/elections">
+                                Elections
+                            </Link>
 
+                            <Link
+                                to="/results"
+                                className="active"
+                            >
+                                Live Results
+                            </Link>
 
-            <main className="results-error-container">
+                            <Link
+                                to="/login"
+                                className="results-login"
+                            >
+                                Login
+                            </Link>
 
-                <div className="results-error-card">
+                        </nav>
 
-                    <div className="error-icon">
-                        !
                     </div>
 
-
-                    <h1>
-                        {electionId
-                            ? "Unable to Load Results"
-                            : "Select an Election"
-                        }
-                    </h1>
+                </header>
 
 
-                    <p>
-                        {electionId
-                            ? error
-                            : "Please select an election to view its live results."
-                        }
-                    </p>
+                <main className="results-error-container">
+
+                    <div className="results-error-card">
+
+                        <div className="error-icon">
+                            !
+                        </div>
 
 
-                    <Link
-                        to="/elections"
-                        className="results-primary-button"
-                    >
-                        View Elections →
-                    </Link>
+                        <h1>
+                            {electionId
+                                ? "Unable to Load Results"
+                                : "Select an Election"
+                            }
+                        </h1>
 
-                </div>
 
-            </main>
+                        <p>
+                            {electionId
+                                ? error
+                                : "Please select an election to view its live results."
+                            }
+                        </p>
 
-        </div>
 
-    );
+                        <Link
+                            to="/elections"
+                            className="results-primary-button"
+                        >
+                            View Elections →
+                        </Link>
 
-}
+                    </div>
+
+                </main>
+
+            </div>
+
+        );
+
+    }
 
     /*
     |--------------------------------------------------------------------------

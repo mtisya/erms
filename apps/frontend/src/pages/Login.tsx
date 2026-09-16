@@ -11,9 +11,7 @@ import {
     useNavigate
 } from "react-router-dom";
 
-import {
-    useAuth
-} from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 
 export default function Login() {
@@ -91,7 +89,7 @@ export default function Login() {
             );
 
 
-        } catch (error: any) {
+        } catch (error: unknown) {
 
             console.error(
                 "Login failed:",
@@ -99,9 +97,10 @@ export default function Login() {
             );
 
 
-            setError(
-                error.message ||
-                "Unable to sign in. Please check your credentials."
+           setError(
+                error instanceof Error
+                    ? error.message
+                    : "Login failed"
             );
 
 
