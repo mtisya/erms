@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+
   pull_request:
     branches:
       - main
@@ -18,6 +19,25 @@ jobs:
   backend-ci:
     name: Backend - Build & Test
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: erms
+          POSTGRES_PASSWORD: erms_password
+          POSTGRES_DB: erms_test
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd "pg_isready -U erms -d erms_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://erms:erms_password@localhost:5432/erms_test?schema=public
 
     steps:
       - name: Checkout repository
@@ -35,6 +55,9 @@ jobs:
 
       - name: Generate Prisma Client
         run: npx prisma generate
+
+      - name: Apply database migrations
+        run: npx prisma migrate deploy
 
       - name: Build backend
         run: npm run build
