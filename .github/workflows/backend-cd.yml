@@ -64,20 +64,26 @@ jobs:
 
           cd "$DEPLOY_PATH"
 
+          NODE_BIN="/home/mutisoft/nodevenv/erms/apps/backend/20/bin"
+
+          echo "Using Node.js from cPanel environment..."
+          "$NODE_BIN/node" -v
+          "$NODE_BIN/npm" -v
+
           echo "Installing dependencies..."
-          npm ci
+          "$NODE_BIN/npm" ci
 
           echo "Generating Prisma Client..."
-          npx prisma generate
+          "$NODE_BIN/npx" prisma generate
 
           echo "Applying production migrations..."
-          npx prisma migrate deploy
+          "$NODE_BIN/npx" prisma migrate deploy
 
           echo "Building backend..."
-          npm run build
+          "$NODE_BIN/npm" run build
 
           echo "Removing development dependencies..."
-          npm prune --omit=dev
+          "$NODE_BIN/npm" prune --omit=dev
 
           echo "Restarting Passenger application..."
           mkdir -p tmp
