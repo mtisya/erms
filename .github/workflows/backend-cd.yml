@@ -58,7 +58,8 @@ jobs:
         run: |
           ssh -i ~/.ssh/erms_github_actions \
             -o IdentitiesOnly=yes \
-            "$DEPLOY_USER@$DEPLOY_HOST" << EOF
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "DEPLOY_PATH='$DEPLOY_PATH' bash -s" << 'EOF'
 
           set -e
 
