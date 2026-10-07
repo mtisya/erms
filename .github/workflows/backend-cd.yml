@@ -1,0 +1,88 @@
+name: Backend CD
+
+on:
+  workflow_run:
+    workflows:
+      - Backend CI
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy Backend to Production
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout CI-approved commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Setup SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          install -m 700 -d ~/.ssh
+
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/erms_github_actions
+          chmod 600 ~/.ssh/erms_github_actions
+
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy backend files
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          rsync -az \
+            --exclude=".env" \
+            --exclude="node_modules/" \
+            --exclude="tmp/" \
+            -e "ssh -i ~/.ssh/erms_github_actions -o IdentitiesOnly=yes" \
+            apps/backend/ \
+            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
+
+      - name: Install dependencies, migrate and build
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          ssh -i ~/.ssh/erms_github_actions \
+            -o IdentitiesOnly=yes \
+            "$DEPLOY_USER@$DEPLOY_HOST" << EOF
+
+          set -e
+
+          cd "$DEPLOY_PATH"
+
+          echo "Installing dependencies..."
+          npm ci
+
+          echo "Generating Prisma Client..."
+          npx prisma generate
+
+          echo "Applying production migrations..."
+          npx prisma migrate deploy
+
+          echo "Building backend..."
+          npm run build
+
+          echo "Removing development dependencies..."
+          npm prune --omit=dev
+
+          echo "Restarting Passenger application..."
+          mkdir -p tmp
+          touch tmp/restart.txt
+
+          echo "Backend deployment completed successfully."
+
+          EOF
