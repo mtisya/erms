@@ -77,10 +77,10 @@ jobs:
           "$NODE_BIN/npm" ci --no-audit --no-fund
 
           echo "Generating Prisma Client..."
-          "$NODE_BIN/npx" prisma generate
+          "$NODE_BIN/npm" exec prisma -- generate
 
           echo "Applying production migrations..."
-          "$NODE_BIN/npx" prisma migrate deploy
+          "$NODE_BIN/npm" exec prisma -- migrate deploy
 
           echo "Building backend..."
           "$NODE_BIN/npm" run build
