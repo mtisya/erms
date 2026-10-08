@@ -74,7 +74,7 @@ jobs:
           "$NODE_BIN/npm" -v
 
           echo "Installing dependencies..."
-          "$NODE_BIN/npm" ci --no-audit --no-fund
+          "$NODE_BIN/npm" ci --include=dev --no-audit --no-fund
 
           echo "Generating Prisma Client..."
           "$NODE_BIN/npm" exec prisma -- generate
