@@ -85,6 +85,12 @@ jobs:
           echo "Building backend..."
           "$NODE_BIN/npm" run build
 
+          echo "Building database seed..."
+          "$NODE_BIN/npm" run build:seed
+
+          echo "Verifying compiled seed..."
+          test -f dist-seed/seed.js
+
           echo "Removing development dependencies..."
           "$NODE_BIN/npm" prune --omit=dev
 
