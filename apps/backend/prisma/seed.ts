@@ -224,11 +224,15 @@ for (const permission of permissions) {
     */
 
 
-    const password =
-        await bcrypt.hash(
-            "Admin@123",
-            10
+   const adminPassword = process.env.ADMIN_SEED_PASSWORD;
+
+    if (!adminPassword || adminPassword.length < 12) {
+        throw new Error(
+            "ADMIN_SEED_PASSWORD must be set and contain at least 12 characters."
         );
+    }
+
+    const password = await bcrypt.hash(adminPassword, 12);
 
 
 
@@ -278,17 +282,10 @@ for (const permission of permissions) {
 
 
 main()
-
-.catch((error)=>{
-
-    console.error(error);
-
-    process.exit(1);
-
-})
-
-.finally(async()=>{
-
-    await prisma.$disconnect();
-
-});
+    .catch((error) => {
+        console.error(error);
+        process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });
