@@ -1,11 +1,11 @@
 import { Router } from "express";
 
 import {
-
-listWards,
-getWard,
-createWard
-
+    listWards,
+    getWard,
+    createWard,
+    updateWard,
+    deleteWard,
 } from "./ward.controller";
 
 
@@ -61,6 +61,19 @@ requirePermission("COUNTY_CREATE"),
 
 createWard
 
+);
+router.put(
+    "/:id",
+    authMiddleware,
+    requirePermission("COUNTY_CREATE"),
+    updateWard,
+);
+
+router.delete(
+    "/:id",
+    authMiddleware,
+    requirePermission("COUNTY_CREATE"),
+    deleteWard,
 );
 
 

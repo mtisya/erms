@@ -1,0 +1,536 @@
+
+/* ========================================
+   ERMS - Geography Management
+======================================== */
+
+.geography-page {
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+    background: #f4f7fb;
+    color: #1e293b;
+    font-family: inherit;
+}
+
+.geography-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Page header */
+
+.geography-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.geography-header h1 {
+    margin: 18px 0 10px;
+    color: #072743;
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-weight: 750;
+    letter-spacing: -0.7px;
+    line-height: 1.2;
+}
+
+.geography-header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.98rem;
+    line-height: 1.7;
+}
+
+.geography-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #1769aa;
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.geography-back-link:hover {
+    color: #072743;
+    text-decoration: underline;
+}
+
+/* Buttons */
+
+.geography-primary-button,
+.geography-secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 11px 20px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 650;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.geography-primary-button {
+    background: #072743;
+    color: #fff;
+}
+
+.geography-primary-button:hover:not(:disabled) {
+    background: #10466f;
+    box-shadow: 0 4px 12px rgb(7 39 67 / 15%);
+}
+
+.geography-secondary-button {
+    flex-shrink: 0;
+    border-color: #d5deea;
+    background: #fff;
+    color: #072743;
+}
+
+.geography-secondary-button:hover:not(:disabled) {
+    border-color: #1769aa;
+    background: #edf5fc;
+}
+
+.geography-primary-button:focus-visible,
+.geography-secondary-button:focus-visible,
+.geography-form input:focus-visible,
+.geography-back-link:focus-visible {
+    outline: 3px solid rgb(37 120 190 / 30%);
+    outline-offset: 3px;
+}
+
+.geography-primary-button:disabled,
+.geography-secondary-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Total counties summary */
+
+
+/* Arrange summary cards side by side */
+.geography-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+    margin: 20px 0 28px;
+    align-items: stretch;
+}
+
+/* Individual summary card */
+.geography-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+
+    min-width: 0;
+    margin: 0;
+    padding: 20px;
+
+    border: 1px solid #e1e9f2;
+    border-left: 4px solid #1769aa;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgb(15 23 42 / 4%);
+
+    text-align: left;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Card labels */
+.geography-summary span {
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Main count */
+.geography-summary strong {
+    color: #072743;
+    font-size: clamp(1.6rem, 2vw, 2rem);
+    font-weight: 750;
+    line-height: 1.1;
+}
+
+/* Hover effect */
+.geography-summary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgb(15 23 42 / 9%);
+}
+
+/* Highlight the selected category */
+.geography-summary.selected {
+    border-color: #1769aa;
+    border-left: 4px solid #1769aa;
+    background: #f5f9ff;
+    box-shadow: 0 0 0 2px rgb(23 105 170 / 10%);
+}
+
+/* Medium screens: two cards per row */
+@media (max-width: 1000px) {
+    .geography-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+}
+
+/* Mobile: stack cards vertically */
+@media (max-width: 520px) {
+    .geography-summary-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .geography-summary {
+        padding: 18px;
+    }
+}
+
+
+/* Main cards */
+
+.geography-card {
+    margin-bottom: 26px;
+    padding: 28px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgb(15 23 42 / 4%);
+}
+
+.geography-card-header {
+    margin-bottom: 24px;
+}
+
+.geography-card-header h2 {
+    margin: 0 0 8px;
+    color: #072743;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.geography-card-header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.93rem;
+    line-height: 1.6;
+}
+
+/* Add county form */
+
+.geography-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 20px;
+}
+
+.geography-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-width: 0;
+    color: #334155;
+    font-size: 0.9rem;
+    font-weight: 650;
+}
+
+.geography-form input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    padding: 11px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #1e293b;
+    font: inherit;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.geography-form input::placeholder {
+    color: #94a3b8;
+}
+
+.geography-form input:focus {
+    border-color: #1769aa;
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(23 105 170 / 12%);
+}
+
+.geography-form .geography-primary-button {
+    white-space: nowrap;
+}
+
+/* Alerts */
+
+.geography-alert {
+    margin-bottom: 20px;
+    padding: 14px 17px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 0.94rem;
+    line-height: 1.5;
+}
+
+.geography-alert-error {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.geography-alert-success {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+    color: #166534;
+}
+
+/* Counties table */
+
+.geography-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.geography-table {
+    width: 100%;
+    min-width: 540px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.geography-table thead {
+    background: #edf3f9;
+}
+
+.geography-table th {
+    padding: 15px 18px;
+    color: #334155;
+    font-size: 0.82rem;
+    font-weight: 750;
+    letter-spacing: 0.35px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.geography-table td {
+    padding: 16px 18px;
+    border-top: 1px solid #e8edf4;
+    color: #475569;
+    font-size: 0.94rem;
+    vertical-align: middle;
+}
+
+.geography-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.geography-table tbody tr:hover {
+    background: #f7faff;
+}
+
+.geography-table tbody tr:first-child td {
+    border-top: none;
+}
+
+.geography-table td:nth-child(2) {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.geography-code {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.85rem;
+    font-weight: 650;
+    letter-spacing: 0.3px;
+}
+
+.geography-empty {
+    margin: 0;
+    padding: 28px 18px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    text-align: center;
+}
+
+/* Tablet */
+
+@media (max-width: 900px) {
+    .geography-page {
+        padding: 30px 20px 45px;
+    }
+
+    .geography-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .geography-form .geography-primary-button {
+        grid-column: 1 / -1;
+        justify-self: start;
+    }
+
+    .geography-card {
+        padding: 24px;
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+    .geography-page {
+        padding: 22px 14px 36px;
+    }
+
+    .geography-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .geography-header h1 {
+        margin-top: 14px;
+        font-size: 1.75rem;
+    }
+
+    .geography-header p {
+        font-size: 0.92rem;
+    }
+
+    .geography-header .geography-secondary-button {
+        width: 100%;
+    }
+
+    .geography-summary {
+        padding: 20px;
+    }
+
+    .geography-summary strong {
+        font-size: 1.75rem;
+    }
+
+    .geography-card {
+        padding: 19px 15px;
+        margin-bottom: 20px;
+    }
+
+    .geography-card-header {
+        margin-bottom: 20px;
+    }
+
+    .geography-card-header h2 {
+        font-size: 1.15rem;
+    }
+
+    .geography-form {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .geography-form .geography-primary-button {
+        grid-column: auto;
+        width: 100%;
+    }
+
+    .geography-table th,
+    .geography-table td {
+        padding: 13px 12px;
+    }
+}
+
+/* Reduced motion accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+    .geography-page *,
+    .geography-page *::before,
+    .geography-page *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+    }
+}
+.geography-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.geography-danger-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fff;
+    color: #b91c1c;
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.geography-danger-button:hover:not(:disabled) {
+    background: #fef2f2;
+    border-color: #ef4444;
+}
+
+.geography-danger-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.geography-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.geography-form-actions button {
+    min-height: 42px;
+}
+
+@media (max-width: 480px) {
+    .geography-form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .geography-form-actions button {
+        width: 100%;
+    }
+}

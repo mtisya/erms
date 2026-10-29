@@ -1,21 +1,21 @@
 import { Router } from "express";
 
 import {
-
-listConstituencies,
-getConstituency,
-createConstituency
-
+    listConstituencies,
+    getConstituency,
+    createConstituency,
+    updateConstituency,
+    deleteConstituency,
 } from "./constituency.controller";
 
 
 import {
-authMiddleware
+    authMiddleware
 } from "../../../common/middleware/auth.middleware";
 
 
 import {
-requirePermission
+    requirePermission
 } from "../../../common/middleware/permission.middleware";
 
 
@@ -25,13 +25,13 @@ const router = Router();
 
 router.get(
 
-"/",
+    "/",
 
-authMiddleware,
+    authMiddleware,
 
-requirePermission("COUNTY_VIEW"),
+    requirePermission("COUNTY_VIEW"),
 
-listConstituencies
+    listConstituencies
 
 );
 
@@ -39,13 +39,13 @@ listConstituencies
 
 router.get(
 
-"/:id",
+    "/:id",
 
-authMiddleware,
+    authMiddleware,
 
-requirePermission("COUNTY_VIEW"),
+    requirePermission("COUNTY_VIEW"),
 
-getConstituency
+    getConstituency
 
 );
 
@@ -53,14 +53,27 @@ getConstituency
 
 router.post(
 
-"/",
+    "/",
 
-authMiddleware,
+    authMiddleware,
 
-requirePermission("COUNTY_CREATE"),
+    requirePermission("COUNTY_CREATE"),
 
-createConstituency
+    createConstituency
 
+);
+router.put(
+    "/:id",
+    authMiddleware,
+    requirePermission("COUNTY_CREATE"),
+    updateConstituency,
+);
+
+router.delete(
+    "/:id",
+    authMiddleware,
+    requirePermission("COUNTY_CREATE"),
+    deleteConstituency,
 );
 
 

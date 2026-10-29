@@ -3,11 +3,15 @@ import { Request, Response } from "express";
 import * as service from "./ward.service";
 
 
+import {
+    createWardSchema,
+    updateWardSchema,
+} from "./ward.validation";
 
 export async function listWards(
-    _req:Request,
-    res:Response
-){
+    _req: Request,
+    res: Response
+) {
 
     const data =
         await service.getWards();
@@ -15,7 +19,7 @@ export async function listWards(
 
     res.json({
 
-        success:true,
+        success: true,
 
         data
 
@@ -27,9 +31,9 @@ export async function listWards(
 
 
 export async function getWard(
-    req:Request<{id:string}>,
-    res:Response
-){
+    req: Request<{ id: string }>,
+    res: Response
+) {
 
     const data =
         await service.getWardById(
@@ -37,13 +41,13 @@ export async function getWard(
         );
 
 
-    if(!data){
+    if (!data) {
 
         return res.status(404).json({
 
-            success:false,
+            success: false,
 
-            message:"Ward not found"
+            message: "Ward not found"
 
         });
 
@@ -52,7 +56,7 @@ export async function getWard(
 
     res.json({
 
-        success:true,
+        success: true,
 
         data
 
@@ -65,39 +69,101 @@ export async function getWard(
 
 
 export async function createWard(
-    req:Request,
-    res:Response
-){
+    req: Request,
+    res: Response,
+) {
+    const validation = createWardSchema.safeParse(req.body);
 
-    try{
-
-
-        const data =
-            await service.createWard(
-                req.body
-            );
-
-
-        res.status(201).json({
-
-            success:true,
-
-            data
-
+    if (!validation.success) {
+        return res.status(400).json({
+            success: false,
+            message: validation.error.issues
+                .map((issue) => issue.message)
+                .join(", "),
         });
-
-
-    }catch(error:any){
-
-
-        res.status(400).json({
-
-            success:false,
-
-            message:error.message
-
-        });
-
     }
 
+    try {
+        const data = await service.createWard(validation.data);
+
+        return res.status(201).json({
+            success: true,
+            data,
+        });
+    } catch (error: unknown) {
+        const message =
+            error instanceof Error
+                ? error.message
+                : "Unable to create ward.";
+
+        return res.status(400).json({
+            success: false,
+            message,
+        });
+    }
+}
+export async function updateWard(
+    req: Request<{ id: string }>,
+    res: Response,
+) {
+    const validation = updateWardSchema.safeParse(req.body);
+
+    if (!validation.success) {
+        return res.status(400).json({
+            success: false,
+            message: validation.error.issues
+                .map((issue) => issue.message)
+                .join(", "),
+        });
+    }
+
+    try {
+        const data = await service.updateWard(
+            req.params.id,
+            validation.data,
+        );
+
+        return res.json({
+            success: true,
+            data,
+        });
+    } catch (error: unknown) {
+        const message =
+            error instanceof Error
+                ? error.message
+                : "Unable to update ward.";
+
+        const status = message === "Ward not found" ? 404 : 400;
+
+        return res.status(status).json({
+            success: false,
+            message,
+        });
+    }
+}
+
+export async function deleteWard(
+    req: Request<{ id: string }>,
+    res: Response,
+) {
+    try {
+        await service.deleteWard(req.params.id);
+
+        return res.json({
+            success: true,
+            message: "Ward deleted successfully.",
+        });
+    } catch (error: unknown) {
+        const message =
+            error instanceof Error
+                ? error.message
+                : "Unable to delete ward.";
+
+        const status = message === "Ward not found" ? 404 : 400;
+
+        return res.status(status).json({
+            success: false,
+            message,
+        });
+    }
 }

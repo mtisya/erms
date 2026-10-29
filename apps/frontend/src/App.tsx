@@ -11,6 +11,7 @@ import Elections from "./pages/Elections";
 import ElectionDetails from "./pages/ElectionDetails";
 import LiveResultsPage from "./pages/LiveResultsPage";
 import AdminResultEntry from "./pages/AdminResultEntry";
+import Geography from "./pages/Geography";
 
 import ProtectedRoute
     from "./components/ProtectedRoute";
@@ -38,12 +39,12 @@ function App() {
                 element={<ProtectedRoute />}
             >
 
-               <Route
-    path="/dashboard"
-    element={
-        <Dashboard />
-    }
-/>
+                <Route
+                    path="/dashboard"
+                    element={
+                        <Dashboard />
+                    }
+                />
 
 
                 <Route
@@ -75,6 +76,10 @@ function App() {
                     element={
                         <AdminResultEntry />
                     }
+                />
+                <Route
+                    path="/geography"
+                    element={<Geography />}
                 />
 
             </Route>

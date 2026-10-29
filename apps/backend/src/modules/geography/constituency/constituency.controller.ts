@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 
 import * as service from "./constituency.service";
 
-
+import {
+    createConstituencySchema,
+    updateConstituencySchema,
+} from "./constituency.validation";
 
 export async function listConstituencies(
     _req:Request,
@@ -98,4 +101,70 @@ export async function createConstituency(
 
     }
 
+}
+
+export async function updateConstituency(
+    req: Request<{ id: string }>,
+    res: Response,
+) {
+    const validation = updateConstituencySchema.safeParse(req.body);
+
+    if (!validation.success) {
+        return res.status(400).json({
+            success: false,
+            message: validation.error.issues
+                .map((issue) => issue.message)
+                .join(", "),
+        });
+    }
+
+    try {
+        const data = await service.updateConstituency(
+            req.params.id,
+            validation.data,
+        );
+
+        return res.json({
+            success: true,
+            data,
+        });
+    } catch (error: unknown) {
+        const message =
+            error instanceof Error
+                ? error.message
+                : "Unable to update constituency.";
+
+        const status = message === "Constituency not found" ? 404 : 400;
+
+        return res.status(status).json({
+            success: false,
+            message,
+        });
+    }
+}
+
+export async function deleteConstituency(
+    req: Request<{ id: string }>,
+    res: Response,
+) {
+    try {
+        await service.deleteConstituency(req.params.id);
+
+        return res.json({
+            success: true,
+            message: "Constituency deleted successfully.",
+        });
+    } catch (error: unknown) {
+        const message =
+            error instanceof Error
+                ? error.message
+                : "Unable to delete constituency.";
+
+        const status = message === "Constituency not found" ? 404 : 400;
+
+        return res.status(status).json({
+            success: false,
+            message,
+        });
+    }
 }

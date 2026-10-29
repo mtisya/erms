@@ -150,10 +150,10 @@ export default function Elections() {
 
 
                     setError(
-    error instanceof Error
-        ? error.message
-        : "Failed to load elections"
-);
+                        error instanceof Error
+                            ? error.message
+                            : "Failed to load elections"
+                    );
 
                 } finally {
 

@@ -1,12 +1,11 @@
 import { Router } from "express";
 
 import {
-
-listPollingStations,
-createPollingStation
-
+    listPollingStations,
+    createPollingStation,
+    updatePollingStation,
+    deletePollingStation,
 } from "./polling.controller";
-
 
 import {
 authMiddleware
@@ -47,7 +46,19 @@ requirePermission("COUNTY_CREATE"),
 createPollingStation
 
 );
+router.put(
+    "/:id",
+    authMiddleware,
+    requirePermission("COUNTY_CREATE"),
+    updatePollingStation,
+);
 
+router.delete(
+    "/:id",
+    authMiddleware,
+    requirePermission("COUNTY_CREATE"),
+    deletePollingStation,
+);
 
 
 export default router;

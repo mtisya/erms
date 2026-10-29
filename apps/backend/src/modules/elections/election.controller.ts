@@ -1,104 +1,91 @@
-    import { Request, Response } from "express";
-    import * as electionService from "./election.service";
 
+import { Request, Response } from "express";
+import { validationResult } from "express-validator";
+import * as electionService from "./election.service";
 
-    export async function createElection(
-        req: Request,
-        res: Response
-    ) {
+export async function createElection(
+    req: Request,
+    res: Response
+) {
+    const errors = validationResult(req);
 
-        const election = await electionService.createElection(
-            req.body
-        );
-
-        res.status(201).json({
-
-            success: true,
-
-            data: election
-
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            success: false,
+            errors: errors.array(),
         });
-
     }
 
+    const election = await electionService.createElection(
+        req.body
+    );
 
-    export async function getElections(
-        _req: Request,
-        res: Response
-    ) {
+    return res.status(201).json({
+        success: true,
+        data: election,
+    });
+}
 
-        const elections = await electionService.getElections();
+export async function getElections(
+    _req: Request,
+    res: Response
+) {
+    const elections = await electionService.getElections();
 
-        res.json({
+    return res.json({
+        success: true,
+        data: elections,
+    });
+}
 
-            success: true,
+export async function getElectionById(
+    req: Request,
+    res: Response
+) {
+    const election = await electionService.getElectionById(
+        req.params.id as string
+    );
 
-            data: elections
+    return res.json({
+        success: true,
+        data: election,
+    });
+}
 
+export async function updateElection(
+    req: Request,
+    res: Response
+) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            success: false,
+            errors: errors.array(),
         });
-
     }
 
+    const election = await electionService.updateElection(
+        req.params.id as string,
+        req.body
+    );
 
-    export async function getElectionById(
-        req: Request,
-        res: Response
-    ) {
+    return res.json({
+        success: true,
+        data: election,
+    });
+}
 
-        const election = await electionService.getElectionById(
-            req.params.id as string
-        );
+export async function deleteElection(
+    req: Request,
+    res: Response
+) {
+    await electionService.deleteElection(
+        req.params.id as string
+    );
 
-        res.json({
-
-            success: true,
-
-            data: election
-
-        });
-
-    }
-
-
-    export async function updateElection(
-        req: Request,
-        res: Response
-    ) {
-
-        const election = await electionService.updateElection(
-
-            req.params.id as string,
-
-            req.body
-
-        );
-
-        res.json({
-
-            success: true,
-
-            data: election
-
-        });
-
-    }
-
-
-    export async function deleteElection(
-        req: Request,
-        res: Response
-    ) {
-
-        await electionService.deleteElection(
-            req.params.id as string
-        );
-
-        res.json({
-
-            success: true,
-
-            message: "Election deleted successfully"
-
-        });
-
-    }
+    return res.json({
+        success: true,
+        message: "Election deleted successfully",
+    });
+}
