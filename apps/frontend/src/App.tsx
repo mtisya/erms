@@ -13,8 +13,8 @@ import LiveResultsPage from "./pages/LiveResultsPage";
 import AdminResultEntry from "./pages/AdminResultEntry";
 import Geography from "./pages/Geography";
 
-import ProtectedRoute
-    from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminElections from "./pages/AdminElections";
 
 
 function App() {
@@ -80,6 +80,10 @@ function App() {
                 <Route
                     path="/geography"
                     element={<Geography />}
+                />
+                <Route
+                    path="/admin/elections"
+                    element={<AdminElections />}
                 />
 
             </Route>

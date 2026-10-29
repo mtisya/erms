@@ -1,3 +1,15 @@
+enum ElectionType {
+  GENERAL
+  BY_ELECTION
+}
+
+enum PositionScope {
+  NATIONAL
+  COUNTY
+  CONSTITUENCY
+  WARD
+}
+
 enum ScopeLevel {
   COUNTY
   CONSTITUENCY
@@ -179,11 +191,12 @@ model PollingStation {
 }
 
 model Election {
-  id          String  @id @default(cuid())
-  name        String
-  year        Int
-  description String?
-  status      String  @default("draft")
+  id           String       @id @default(cuid())
+  name         String
+  year         Int
+  description  String?
+  status       String       @default("draft")
+  electionType ElectionType @default(GENERAL)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -196,9 +209,10 @@ model Election {
 }
 
 model ElectionPosition {
-  id         String @id @default(cuid())
+  id         String        @id @default(cuid())
   name       String
   electionId String
+  scope      PositionScope @default(COUNTY)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

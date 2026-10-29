@@ -1,0 +1,356 @@
+
+.admin-elections-page {
+    min-height: 100vh;
+    padding: 48px 24px 72px;
+    background: #f5f7fa;
+    color: #172b3a;
+    box-sizing: border-box;
+}
+
+.admin-elections-container {
+    max-width: 1250px;
+    margin: 0 auto;
+}
+
+.admin-elections-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.admin-elections-eyebrow {
+    color: #a78016;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+}
+
+.admin-elections-header h1 {
+    margin: 10px 0;
+    color: #072743;
+    font-size: clamp(28px, 4vw, 38px);
+}
+
+.admin-elections-header p,
+.admin-elections-panel-heading p {
+    margin: 0;
+    color: #687789;
+    line-height: 1.6;
+}
+
+.admin-elections-panel {
+    margin-bottom: 28px;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid #e5eaf0;
+    border-radius: 14px;
+    box-shadow: 0 5px 20px rgba(7, 39, 67, 0.04);
+}
+
+.admin-elections-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.admin-elections-panel-heading h2 {
+    margin: 0 0 8px;
+    color: #072743;
+    font-size: 21px;
+}
+
+.admin-elections-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.admin-elections-form-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    color: #344457;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.admin-elections-form-grid input,
+.admin-elections-form-grid select,
+.admin-elections-form-grid textarea {
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 14px;
+    box-sizing: border-box;
+    border: 1px solid #d9e0e8;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #172b3a;
+    font: inherit;
+    font-weight: 400;
+}
+
+.admin-elections-form-grid textarea {
+    resize: vertical;
+}
+
+.admin-elections-form-grid input:focus,
+.admin-elections-form-grid select:focus,
+.admin-elections-form-grid textarea:focus {
+    outline: none;
+    border-color: #c9a227;
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.12);
+}
+
+.admin-elections-form-grid input:disabled,
+.admin-elections-form-grid select:disabled,
+.admin-elections-form-grid textarea:disabled {
+    background: #f2f4f7;
+    cursor: not-allowed;
+}
+
+.admin-elections-description {
+    grid-column: 1 / -1;
+}
+
+.admin-elections-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.admin-elections-primary-button,
+.admin-elections-secondary-button,
+.admin-elections-edit-button,
+.admin-elections-delete-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-elections-primary-button {
+    background: #072743;
+    color: #ffffff;
+}
+
+.admin-elections-primary-button:hover {
+    background: #103b5e;
+}
+
+.admin-elections-secondary-button {
+    background: #ffffff;
+    border-color: #d8e0e8;
+    color: #263b50;
+}
+
+.admin-elections-secondary-button:hover {
+    background: #f3f6f9;
+}
+
+.admin-elections-edit-button {
+    background: #edf4fb;
+    color: #174c78;
+}
+
+.admin-elections-edit-button:hover {
+    background: #dceaf7;
+}
+
+.admin-elections-delete-button {
+    background: #fff0f0;
+    color: #a12626;
+}
+
+.admin-elections-delete-button:hover {
+    background: #ffe0e0;
+}
+
+.admin-elections-primary-button:disabled,
+.admin-elections-secondary-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.admin-elections-alert {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    line-height: 1.5;
+}
+
+.admin-elections-alert.error {
+    background: #fff1f1;
+    border-color: #f1caca;
+    color: #922626;
+}
+
+.admin-elections-alert.success {
+    background: #edf9f0;
+    border-color: #c8e8d0;
+    color: #206b38;
+}
+
+.admin-elections-empty {
+    padding: 24px 8px;
+    color: #687789;
+    text-align: center;
+}
+
+.admin-elections-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-elections-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.admin-elections-table th,
+.admin-elections-table td {
+    padding: 16px 14px;
+    border-bottom: 1px solid #edf0f4;
+    vertical-align: middle;
+}
+
+.admin-elections-table th {
+    background: #f8fafc;
+    color: #59697b;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.admin-elections-table td {
+    color: #344457;
+    font-size: 14px;
+}
+
+.admin-elections-table td strong {
+    color: #072743;
+}
+
+.admin-elections-description-text {
+    display: block;
+    max-width: 300px;
+    margin-top: 5px;
+    color: #778596;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.admin-election-status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: #edf0f4;
+    color: #4d5c6c;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+.admin-election-status.active {
+    background: #e5f6eb;
+    color: #20733e;
+}
+
+.admin-election-status.completed {
+    background: #e8efff;
+    color: #294f9d;
+}
+
+.admin-election-status.draft {
+    background: #fff4d8;
+    color: #8b6811;
+}
+
+.admin-elections-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.admin-elections-confirmation {
+    margin-top: 24px;
+    padding: 22px;
+    border: 1px solid #f0caca;
+    border-radius: 10px;
+    background: #fff9f9;
+}
+
+.admin-elections-confirmation h3 {
+    margin: 0 0 10px;
+    color: #842323;
+}
+
+.admin-elections-confirmation p {
+    color: #594343;
+    line-height: 1.7;
+}
+
+.admin-elections-message {
+    max-width: 650px;
+    margin: 80px auto;
+    padding: 32px;
+    border: 1px solid #e5eaf0;
+    border-radius: 12px;
+    background: #ffffff;
+    line-height: 1.7;
+}
+
+.admin-elections-message h1 {
+    color: #072743;
+}
+
+.admin-elections-message a {
+    color: #174c78;
+    font-weight: 700;
+}
+
+@media (max-width: 700px) {
+    .admin-elections-page {
+        padding: 30px 14px 48px;
+    }
+
+    .admin-elections-panel {
+        padding: 20px 15px;
+    }
+
+    .admin-elections-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-elections-description {
+        grid-column: auto;
+    }
+
+    .admin-elections-header {
+        align-items: flex-start;
+    }
+
+    .admin-elections-table th,
+    .admin-elections-table td {
+        padding: 12px 10px;
+    }
+}

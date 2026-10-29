@@ -446,7 +446,7 @@ export default function Dashboard() {
 
 
                         <Link
-                            to="/elections"
+                            to="/admin/elections"
                             className="feature-card dashboard-action-card"
                         >
 

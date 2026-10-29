@@ -76,16 +76,31 @@ export async function updateElection(
     });
 }
 
+
 export async function deleteElection(
     req: Request,
     res: Response
 ) {
-    await electionService.deleteElection(
+    const result = await electionService.deleteElection(
         req.params.id as string
     );
 
+    if (!result.deleted) {
+        if (result.reason === "not_found") {
+            return res.status(404).json({
+                success: false,
+                message: "Election not found.",
+            });
+        }
+
+        return res.status(409).json({
+            success: false,
+            message: "This election cannot be deleted because it has recorded results.",
+        });
+    }
+
     return res.json({
         success: true,
-        message: "Election deleted successfully",
+        message: "Election deleted successfully.",
     });
 }
